@@ -62,14 +62,22 @@ describe("GET api/reviews/:review_id", () => {
         });
     });
   });
-  //   describe("error handling", () => {
-  //     it("Status 404, path not found when putting in an invalid endpoint", () => {
-  //       return request(app)
-  //         .get("/apiwooo")
-  //         .expect(404)
-  //         .then(({ body }) => {
-  //           expect(body.msg).toBe("path not found");
-  //         });
-  //     });
-  //   });
+  describe("error handling", () => {
+    it("Status 404, review not found if a review_id is a number but does not exist", () => {
+      return request(app)
+        .get("/api/reviews/999")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("review not found");
+        });
+    });
+    it("Status 400, bad request if review_id is not a number", () => {
+      return request(app)
+        .get("/api/reviews/dog")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("bad request");
+        });
+    });
+  });
 });
