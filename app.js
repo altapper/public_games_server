@@ -7,6 +7,8 @@ const {
   handles500s,
 } = require("./controllers/errors-controller.js");
 
+app.use(express.json());
+
 app.use("/api", apiRouter);
 
 app.all("*", (req, res) => {

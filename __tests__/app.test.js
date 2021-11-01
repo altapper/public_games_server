@@ -81,3 +81,37 @@ describe("GET api/reviews/:review_id", () => {
     });
   });
 });
+
+describe("PATCH api/reviews/:review_id", () => {
+  describe("happy path", () => {
+    it("Status 200, returns the corresponding review object with the votes updated", () => {
+      const patchObj = { inc_votes: 3 };
+      return request(app)
+        .patch("/api/reviews/2")
+        .send(patchObj)
+        .expect(200)
+        .then(({ body }) => {
+          const review = body.review;
+          expect(review.votes).toBe(8);
+        });
+    });
+  });
+  //   describe("error handling", () => {
+  //     it("Status 404, review not found if a review_id is a number but does not exist", () => {
+  //       return request(app)
+  //         .get("/api/reviews/999")
+  //         .expect(404)
+  //         .then(({ body }) => {
+  //           expect(body.msg).toBe("review not found");
+  //         });
+  //     });
+  //     it("Status 400, bad request if review_id is not a number", () => {
+  //       return request(app)
+  //         .get("/api/reviews/dog")
+  //         .expect(400)
+  //         .then(({ body }) => {
+  //           expect(body.msg).toBe("bad request");
+  //         });
+  //     });
+  //   });
+});
