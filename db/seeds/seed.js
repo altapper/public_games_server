@@ -32,7 +32,7 @@ const seed = (data) => {
     .then(() => {
       return db.query(`CREATE TABLE reviews (
         review_id SERIAL PRIMARY KEY,
-        title VARCHAR(40),
+        title VARCHAR(100),
         review_body TEXT,
         designer VARCHAR(40),
         review_img_url TEXT DEFAULT 'https://images.pexels.com/photos/163064/play-stone-network-networked-interactive-163064.jpeg',
@@ -59,6 +59,51 @@ const seed = (data) => {
         %L
         RETURNING *;`,
         categoryData.map((category) => [category.slug, category.description])
+      );
+      return db.query(queryStr);
+    })
+    .then(() => {
+      const queryStr = format(
+        `INSERT INTO users (username, avatar_url, name)
+        VALUES 
+        %L
+        RETURNING *;`,
+        userData.map((user) => [user.username, user.avatar_url, user.name])
+      );
+      return db.query(queryStr);
+    })
+    .then(() => {
+      const queryStr = format(
+        `INSERT INTO reviews (title, review_body, designer, review_img_url, votes, category, created_at, owner)
+        VALUES 
+        %L
+        RETURNING *;`,
+        reviewData.map((review) => [
+          review.title,
+          review.review_body,
+          review.designer,
+          review.review_img_url,
+          review.votes,
+          review.category,
+          review.created_at,
+          review.owner,
+        ])
+      );
+      return db.query(queryStr);
+    })
+    .then(() => {
+      const queryStr = format(
+        `INSERT INTO comments (author, review_id, votes, created_at, body)
+        VALUES 
+        %L
+        RETURNING *;`,
+        commentData.map((comment) => [
+          comment.author,
+          comment.review_id,
+          comment.votes,
+          comment.created_at,
+          comment.body,
+        ])
       );
       return db.query(queryStr);
     })
