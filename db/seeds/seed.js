@@ -106,12 +106,10 @@ const seed = (data) => {
         ])
       );
       return db.query(queryStr);
-    })
-    .then(({ rows }) => {
-      console.log(rows);
     });
-
-  // 2. insert data
+  // .then(({ rows }) => {
+  //   console.log(rows);
+  // });
 };
 
 module.exports = seed;
