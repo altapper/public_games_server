@@ -139,3 +139,94 @@ describe("PATCH api/reviews/:review_id", () => {
     });
   });
 });
+
+describe("GET api/reviews", () => {
+  describe("happy path with no queries etc", () => {
+    it("Status 200, returns an object with an array of reviews sorted by date by default, with total comments as a new key", () => {
+      return request(app)
+        .get("/api/reviews")
+        .expect(200)
+        .then(({ body }) => {
+          const reviews = body.reviews;
+          expect(reviews.length).toBe(13);
+          expect(reviews[0].comment_count).toBe("0");
+          expect(reviews[6].comment_count).toBe("3");
+          expect(reviews).toBeSortedBy("created_at", { descending: true });
+          //console.log(reviews);
+        });
+    });
+    it("Status 200, returns an object with an array of reviews sorted by a different key - e.g. designer", () => {
+      return request(app)
+        .get("/api/reviews?sort_by=review_body")
+        .expect(200)
+        .then(({ body }) => {
+          const reviews = body.reviews;
+          console.log(reviews);
+          expect(reviews.length).toBe(13);
+          expect(reviews).toBeSortedBy("review_body", { descending: true });
+        });
+    });
+    it("Status 200, returns an object with an array of reviews sorted default key but ascending order", () => {
+      return request(app)
+        .get("/api/reviews?order=asc")
+        .expect(200)
+        .then(({ body }) => {
+          const reviews = body.reviews;
+          //console.log(reviews);
+          expect(reviews.length).toBe(13);
+          expect(reviews).toBeSortedBy("created_at", { descending: false });
+        });
+    });
+    it("Status 200, returns an object with an array of reviews sorted by a different key - e.g. designer - and ascending order!", () => {
+      return request(app)
+        .get("/api/reviews?sort_by=review_body&&order=asc")
+        .expect(200)
+        .then(({ body }) => {
+          const reviews = body.reviews;
+          console.log(reviews);
+          expect(reviews.length).toBe(13);
+          expect(reviews).toBeSortedBy("review_body", { descending: false });
+        });
+    });
+    it("Status 200, returns an object in default sort order with category='social deduction'", () => {
+      return request(app)
+        .get("/api/reviews?category=social deduction")
+        .expect(200)
+        .then(({ body }) => {
+          const reviews = body.reviews;
+          console.log(reviews);
+          expect(reviews.length).toBe(11);
+          reviews.forEach((review) => {
+            expect(review.category).toBe("social deduction");
+          });
+          expect(reviews).toBeSortedBy("created_at", { descending: true });
+        });
+    });
+    it("Status 200, returns an object sorted by designer in ascending order, with category='social deduction'", () => {
+      return request(app)
+        .get(
+          "/api/reviews?sort_by=designer&&order=asc&&category=social deduction"
+        )
+        .expect(200)
+        .then(({ body }) => {
+          const reviews = body.reviews;
+          console.log(reviews);
+          expect(reviews.length).toBe(11);
+          reviews.forEach((review) => {
+            expect(review.category).toBe("social deduction");
+          });
+          expect(reviews).toBeSortedBy("designer", { descending: false });
+        });
+    });
+  });
+  // describe("error handling", () => {
+  //   it("Status 404, path not found when putting in an invalid endpoint", () => {
+  //     return request(app)
+  //       .get("/apiwooo")
+  //       .expect(404)
+  //       .then(({ body }) => {
+  //         expect(body.msg).toBe("path not found");
+  //       });
+  //   });
+  // });
+});
