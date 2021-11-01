@@ -161,7 +161,7 @@ describe("GET api/reviews", () => {
         .expect(200)
         .then(({ body }) => {
           const reviews = body.reviews;
-          console.log(reviews);
+          //console.log(reviews);
           expect(reviews.length).toBe(13);
           expect(reviews).toBeSortedBy("review_body", { descending: true });
         });
@@ -183,7 +183,7 @@ describe("GET api/reviews", () => {
         .expect(200)
         .then(({ body }) => {
           const reviews = body.reviews;
-          console.log(reviews);
+          //console.log(reviews);
           expect(reviews.length).toBe(13);
           expect(reviews).toBeSortedBy("review_body", { descending: false });
         });
@@ -194,7 +194,7 @@ describe("GET api/reviews", () => {
         .expect(200)
         .then(({ body }) => {
           const reviews = body.reviews;
-          console.log(reviews);
+          //console.log(reviews);
           expect(reviews.length).toBe(11);
           reviews.forEach((review) => {
             expect(review.category).toBe("social deduction");
@@ -210,7 +210,7 @@ describe("GET api/reviews", () => {
         .expect(200)
         .then(({ body }) => {
           const reviews = body.reviews;
-          console.log(reviews);
+          //console.log(reviews);
           expect(reviews.length).toBe(11);
           reviews.forEach((review) => {
             expect(review.category).toBe("social deduction");
@@ -219,14 +219,42 @@ describe("GET api/reviews", () => {
         });
     });
   });
-  // describe("error handling", () => {
-  //   it("Status 404, path not found when putting in an invalid endpoint", () => {
-  //     return request(app)
-  //       .get("/apiwooo")
-  //       .expect(404)
-  //       .then(({ body }) => {
-  //         expect(body.msg).toBe("path not found");
-  //       });
-  //   });
-  // });
+  describe("error handling", () => {
+    it("Status 400, invalid sort query for sort_by", () => {
+      return request(app)
+        .get(
+          "/api/reviews?sort_by=designerwoo&&order=asc&&category=social deduction"
+        )
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("invalid sort query");
+        });
+    });
+    it("Status 400, invalid sort query for order", () => {
+      return request(app)
+        .get(
+          "/api/reviews?sort_by=designer&&order=ascending&&category=social deduction"
+        )
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("invalid sort query");
+        });
+    });
+    it("Status 404, category not in database/not found", () => {
+      return request(app)
+        .get("/api/reviews?category=nonexistent category")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("category not found");
+        });
+    });
+    it("Status 404, no reviews found with that category", () => {
+      return request(app)
+        .get("/api/reviews?category=children's games")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("no reviews found with that category");
+        });
+    });
+  });
 });

@@ -59,15 +59,47 @@ exports.fetchAllReviews = (
     return Promise.reject({ status: 400, msg: "invalid sort query" });
   }
 
+  const queryVals = [];
+
   let queryStr = `SELECT reviews.*, COUNT(comment_id) AS comment_count FROM reviews LEFT JOIN comments ON reviews.review_id = comments.review_id `;
 
   if (category) {
-    queryStr += `WHERE category = '${category}' `;
+    queryStr += `WHERE category = $1 `;
+    queryVals.push(category);
   }
 
   queryStr += `GROUP BY reviews.review_id ORDER BY ${sort_by} ${order};`;
 
-  return db.query(queryStr).then(({ rows }) => {
+  return Promise.all([
+    db.query(queryStr, queryVals),
+    db.query(`SELECT * FROM categories;`),
+  ]).then(([{ rows }, result2]) => {
+    const categories = result2.rows;
+    const catSlugs = categories.map((category) => category.slug);
+    if (category) {
+      if (!catSlugs.includes(category)) {
+        return Promise.reject({
+          status: 404,
+          msg: "category not found",
+        });
+      }
+    }
+    if (rows.length === 0) {
+      return Promise.reject({
+        status: 404,
+        msg: "no reviews found with that category",
+      });
+    }
     return rows;
   });
+
+  // return db.query(queryStr, queryVals).then(({ rows }) => {
+  //   if (rows.length === 0) {
+  //     return Promise.reject({
+  //       status: 404,
+  //       msg: "no reviews found with that category",
+  //     });
+  //   }
+  //   return rows;
+  // });
 };
