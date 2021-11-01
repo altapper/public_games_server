@@ -96,22 +96,46 @@ describe("PATCH api/reviews/:review_id", () => {
         });
     });
   });
-  //   describe("error handling", () => {
-  //     it("Status 404, review not found if a review_id is a number but does not exist", () => {
-  //       return request(app)
-  //         .get("/api/reviews/999")
-  //         .expect(404)
-  //         .then(({ body }) => {
-  //           expect(body.msg).toBe("review not found");
-  //         });
-  //     });
-  //     it("Status 400, bad request if review_id is not a number", () => {
-  //       return request(app)
-  //         .get("/api/reviews/dog")
-  //         .expect(400)
-  //         .then(({ body }) => {
-  //           expect(body.msg).toBe("bad request");
-  //         });
-  //     });
-  //   });
+  describe("error handling", () => {
+    it("Status 404, review not found if a review_id is a number but does not exist", () => {
+      const patchObj = { inc_votes: 3 };
+      return request(app)
+        .patch("/api/reviews/999")
+        .send(patchObj)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("review not found");
+        });
+    });
+    it("Status 400, bad request if review_id is not a number", () => {
+      const patchObj = { inc_votes: 3 };
+      return request(app)
+        .patch("/api/reviews/dog")
+        .send(patchObj)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("bad request");
+        });
+    });
+    it("Status 400, bad request if there is no inc_votes key on the patch Object", () => {
+      const patchObj = { no_inc_votes: 3 };
+      return request(app)
+        .patch("/api/reviews/2")
+        .send(patchObj)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("bad request");
+        });
+    });
+    it("Status 400, bad request if there inc_votes is not a number", () => {
+      const patchObj = { inc_votes: "hello" };
+      return request(app)
+        .patch("/api/reviews/2")
+        .send(patchObj)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("bad request");
+        });
+    });
+  });
 });

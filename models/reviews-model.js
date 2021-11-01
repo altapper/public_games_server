@@ -23,6 +23,12 @@ exports.updateReview = (inc_votes, review_id) => {
       [inc_votes, review_id]
     )
     .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: "review not found",
+        });
+      }
       return rows[0];
     });
 };
