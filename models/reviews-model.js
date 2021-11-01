@@ -73,11 +73,11 @@ exports.fetchAllReviews = (
   return Promise.all([
     db.query(queryStr, queryVals),
     db.query(`SELECT * FROM categories;`),
-  ]).then(([{ rows }, result2]) => {
-    const categories = result2.rows;
-    const catSlugs = categories.map((category) => category.slug);
+  ]).then(([{ rows }, categoryTable]) => {
+    const categories = categoryTable.rows;
+    const categorySlugs = categories.map((category) => category.slug);
     if (category) {
-      if (!catSlugs.includes(category)) {
+      if (!categorySlugs.includes(category)) {
         return Promise.reject({
           status: 404,
           msg: "category not found",
