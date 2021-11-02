@@ -3,8 +3,11 @@ const {
   getReviewById,
   getUpdatedReview,
   getAllReviews,
-  postCommentToReview,
 } = require("../controllers/reviews-controller.js");
+
+const {
+  postCommentToReview,
+} = require("../controllers/comments-controller.js");
 
 reviewsRouter.route("/:review_id").get(getReviewById).patch(getUpdatedReview);
 
