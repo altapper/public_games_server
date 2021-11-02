@@ -258,3 +258,49 @@ describe("GET api/reviews", () => {
     });
   });
 });
+
+describe("POST /api/reviews/:review_id/comments", () => {
+  describe("happy path", () => {
+    it("Status 201, responds with the successfully posted comment, valid username", () => {
+      return request(app)
+        .post("/api/reviews/2/comments")
+        .send({ username: "bainesface", body: "I like this game a lot." })
+        .expect(201)
+        .then(({ body }) => {
+          const comment = body.comment;
+          expect(comment.review_id).toBe(2);
+          expect(comment.author).toBe("bainesface");
+          expect(comment.body).toBe("I like this game a lot.");
+        });
+    });
+  });
+  describe("error handling", () => {
+    it("Status 400, when username is not an existing user", () => {
+      return request(app)
+        .post("/api/reviews/2/comments")
+        .send({ username: "altapper", body: "I like this game a lot." })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("invalid input");
+        });
+    });
+    it("Status 400, when review_id is not an existing id", () => {
+      return request(app)
+        .post("/api/reviews/99/comments")
+        .send({ username: "bainesface", body: "I like this game a lot." })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("invalid input");
+        });
+    });
+    it("Status 400, bad request when username or body are not supplied", () => {
+      return request(app)
+        .post("/api/reviews/2/comments")
+        .send({ username: "bainesface" })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("bad request");
+        });
+    });
+  });
+});
