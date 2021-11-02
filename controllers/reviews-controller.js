@@ -16,15 +16,6 @@ exports.getReviewById = (req, res, next) => {
 };
 
 exports.getUpdatedReview = (req, res, next) => {
-  if (!req.body.hasOwnProperty("inc_votes")) {
-    return Promise.reject({
-      status: 400,
-      msg: "bad request",
-    }).catch((err) => {
-      next(err);
-    });
-  }
-
   const inc_votes = req.body.inc_votes;
   const review_id = req.params.review_id;
   updateReview(inc_votes, review_id)

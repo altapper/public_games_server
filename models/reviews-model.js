@@ -15,6 +15,12 @@ exports.fetchReviewById = (review_id) => {
 };
 
 exports.updateReview = (inc_votes, review_id) => {
+  if (inc_votes === undefined) {
+    return Promise.reject({
+      status: 400,
+      msg: "bad request",
+    });
+  }
   return db
     .query(
       `UPDATE reviews SET votes = votes + $1
@@ -83,12 +89,6 @@ exports.fetchAllReviews = (
           msg: "category not found",
         });
       }
-    }
-    if (rows.length === 0) {
-      return Promise.reject({
-        status: 404,
-        msg: "no reviews found with that category",
-      });
     }
     return rows;
   });

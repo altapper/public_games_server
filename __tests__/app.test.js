@@ -127,7 +127,7 @@ describe("PATCH api/reviews/:review_id", () => {
           expect(body.msg).toBe("bad request");
         });
     });
-    it("Status 400, bad request if there inc_votes is not a number", () => {
+    it("Status 400, bad request if the inc_votes is not a number", () => {
       const patchObj = { inc_votes: "hello" };
       return request(app)
         .patch("/api/reviews/2")
@@ -248,12 +248,12 @@ describe("GET api/reviews", () => {
           expect(body.msg).toBe("category not found");
         });
     });
-    it("Status 404, no reviews found with that category", () => {
+    it("Status 200, no reviews found with that category but that's fine", () => {
       return request(app)
         .get("/api/reviews?category=children's games")
-        .expect(404)
+        .expect(200)
         .then(({ body }) => {
-          expect(body.msg).toBe("no reviews found with that category");
+          expect(body.reviews).toEqual([]);
         });
     });
   });
